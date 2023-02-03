@@ -13,7 +13,7 @@
                 "-o main",
                 "-lglad",
                 "-lglfw3dll",
-                // "${workspaceFolder}/myprogram.exe"
+                "${workspaceFolder}\\main.exe"
             ],
             "options": {
                 "cwd": "${fileDirname}"
