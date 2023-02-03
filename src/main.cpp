@@ -33,9 +33,9 @@ int main()
     // -----------
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(0.0f, 1.f, 0.0f,1.0f);
+        glClearColor(0.0f, 1.f, 1.0f,1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        // glfw: swap buffers and poll IO events (keyspressed/released, mouse moved etc.)
+        // glfw: swap buffers and poll IO events (keypresses/released, mouse moved etc.)
         // ---------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
