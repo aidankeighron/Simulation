@@ -1,2 +1,0 @@
-C:\Users\aidan\OneDrive\Documents\Programms\Simulation\Simulation\Simulation\obj\Debug\Simulation.csproj.AssemblyReference.cache
-C:\Users\aidan\OneDrive\Documents\Programms\Simulation\Simulation\Simulation\obj\Debug\Simulation.csproj.CoreCompileInputs.cache
