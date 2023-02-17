@@ -36,7 +36,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Simulation.cs" />
+    <Compile Include="Physics.cs" />
+    <Compile Include="PhysicsObject.cs" />
+    <Compile Include="Simulation.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
