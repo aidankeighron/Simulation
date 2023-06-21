@@ -17,8 +17,9 @@ namespace Simulation
         private PointF CubePosition = new PointF(0, 0);
         private PointF CubeStartVelocity = new PointF(0, 0);
         private PointF CubeVelocity = new PointF(0, 0);
+        private float CubeCoefficientOfRestitution = 0.9f;
 
-        // 
+        // Other
         private float ReferenceTimestamp = 0;
         private int TextY = 0;
 
@@ -59,7 +60,7 @@ namespace Simulation
         public void MouseControls()
         {
             MousePosition = Cursor.Position;
-            MouseVelocity = new PointF((MousePosition.X - LastMousePosition.X) / Dt, (MousePosition.Y - LastMousePosition.Y) / Dt);
+            MouseVelocity = new PointF((MousePosition.X - LastMousePosition.X) / (Dt * 4), (MousePosition.Y - LastMousePosition.Y) / (Dt * 4));
             LastMousePosition = MousePosition;
             if (GetLeftMousePressed())
             {
@@ -76,18 +77,24 @@ namespace Simulation
             if (CubePosition.X <= 0 + CubeSize / 2.0f)
             {
                 CubePosition.X = 0 + CubeSize / 2.0f;
+                CubeVelocity.X *= -CubeCoefficientOfRestitution;
+                CubeStartVelocity.X *= -CubeCoefficientOfRestitution;
+                ReferenceTimestamp = Simulation.TimestampSeconds;
             }
             if (CubePosition.X >= 1280 - CubeSize / 2.0f)
             {
                 CubePosition.X = 1280 - CubeSize / 2.0f;
+                CubeVelocity.X *= -CubeCoefficientOfRestitution;
             }
             if (CubePosition.Y <= 0 + CubeSize / 2.0f)
             {
                 CubePosition.Y = 0 + CubeSize / 2.0f;
+                CubeVelocity.Y *= -CubeCoefficientOfRestitution;
             }
             if (CubePosition.Y >= 720 - CubeSize / 2.0f)
             {
                 CubePosition.Y = 720 - CubeSize / 2.0f;
+                CubeVelocity.Y *= -CubeCoefficientOfRestitution;
             }
         }
 
