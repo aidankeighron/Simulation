@@ -9,18 +9,14 @@ namespace Simulation
     {
         // Constants
         public const float Gravity = 9.8f;
-        public const float Dt = Simulation.Interval / 1000.0f;
+        public const float Dt = Simulation.Interval / 100.0f;
+        public const int ScreenWidth = 1536; // TODO pull from system
+        public const int ScreenHeight = 960;
 
         // Cube
-        private int CubeSize = 50;
-        private PointF CubeStartPosition = new PointF(150, 150);
-        private PointF CubePosition = new PointF(0, 0);
-        private PointF CubeStartVelocity = new PointF(0, 0);
-        private PointF CubeVelocity = new PointF(0, 0);
-        private float CubeCoefficientOfRestitution = 0.9f;
+        private CubePhysics Cube = new CubePhysics(50);
 
         // Other
-        private float ReferenceTimestamp = 0;
         private int TextY = 0;
 
         // Mouse
@@ -28,33 +24,21 @@ namespace Simulation
         private PointF LastMousePosition = new PointF(0, 0);
         private PointF MouseVelocity = new PointF(0, 0);
 
-        public Physics()
+        public void DrawPhysics(Graphics g)
         {
-            Action<Graphics> drawPhysics = (g) =>
-            {
-                MouseControls();
-                HandleGravity();
-                BoundValues();
-                Pen p = new Pen(Color.Black, 1);
-                g.DrawRectangle(p, CubePosition.X - CubeSize / 2.0f, CubePosition.Y - CubeSize / 2.0f, CubeSize, CubeSize);
-                DisplayText("Position: ", CubePosition, g);
-                DisplayText("Position 0: ", CubeStartPosition, g);
-                DisplayText("Velocity: ", CubeVelocity, g);
-                DisplayText("Velocity 0: ", CubeStartVelocity, g);
-                DisplayText("MPos: ", MousePosition, g);
-                DisplayText("MVel 0: ", MouseVelocity, g);
-                TextY = 0;
-            };
-
-            Simulation.RegesterDrawer(drawPhysics);
-        }
-
-        public void HandleGravity()
-        {
-            CubePosition.X = CubeStartPosition.X + CubeStartVelocity.X * Timestamp();
-            CubePosition.Y = CubeStartPosition.Y + CubeStartVelocity.Y * Timestamp() + 0.5f * Gravity * Timestamp() * Timestamp();
-            CubeVelocity.X = CubeStartVelocity.X;
-            CubeVelocity.Y = CubeStartVelocity.Y + Gravity * Timestamp();
+            MouseControls();
+            Cube.tick(Dt);
+            Cube.DrawCube(g);
+            DisplayText("Position", Cube.getPosition(), g);
+            DisplayText("Start Position", Cube.getStartPosition(), g);
+            DisplayText("Velocity", Cube.getVelocity(), g);
+            DrawVector(g, Color.Green, Cube.getPosition(), Cube.getVelocity());
+            DisplayText("Start Velocity", Cube.getStartVelocity(), g);
+            DisplayText("Acceleration", Cube.getAcceleration(), g);
+            DrawVector(g, Color.Red, Cube.getPosition(), Cube.getAcceleration());
+            DisplayText("MPos: ", MousePosition, g);
+            DisplayText("MVel: ", MouseVelocity, g);
+            TextY = 0;
         }
 
         public void MouseControls()
@@ -64,49 +48,19 @@ namespace Simulation
             LastMousePosition = MousePosition;
             if (GetLeftMousePressed())
             {
-                ReferenceTimestamp = Simulation.TimestampSeconds;
-                CubePosition = MousePosition;
-                CubeStartPosition = MousePosition;
-                CubeStartVelocity = MouseVelocity;
-                CubeVelocity = MouseVelocity;
+                Cube.Restart(MousePosition.X, MousePosition.Y, MouseVelocity.X, MouseVelocity.Y);
             }
         }
 
-        public void BoundValues()
+        private void DisplayText(String name, object value, Graphics g)
         {
-            if (CubePosition.X <= 0 + CubeSize / 2.0f)
-            {
-                CubePosition.X = 0 + CubeSize / 2.0f;
-                CubeVelocity.X *= -CubeCoefficientOfRestitution;
-                CubeStartVelocity.X *= -CubeCoefficientOfRestitution;
-                ReferenceTimestamp = Simulation.TimestampSeconds;
-            }
-            if (CubePosition.X >= 1280 - CubeSize / 2.0f)
-            {
-                CubePosition.X = 1280 - CubeSize / 2.0f;
-                CubeVelocity.X *= -CubeCoefficientOfRestitution;
-            }
-            if (CubePosition.Y <= 0 + CubeSize / 2.0f)
-            {
-                CubePosition.Y = 0 + CubeSize / 2.0f;
-                CubeVelocity.Y *= -CubeCoefficientOfRestitution;
-            }
-            if (CubePosition.Y >= 720 - CubeSize / 2.0f)
-            {
-                CubePosition.Y = 720 - CubeSize / 2.0f;
-                CubeVelocity.Y *= -CubeCoefficientOfRestitution;
-            }
-        }
-
-        public float Timestamp()
-        {
-            return Simulation.TimestampSeconds - ReferenceTimestamp;
-        }
-
-        private void DisplayText(String text, object value, Graphics g)
-        {
-            g.DrawString(text + value.ToString(), new Font("Arial", 10), new SolidBrush(Color.Black), new PointF(5, 5 + TextY));
+            g.DrawString($"{name}: {value.ToString()}", new Font("Arial", 10), new SolidBrush(Color.Black), new PointF(5, 5 + TextY));
             TextY += 20;
+        }
+
+        public void DrawVector(Graphics g, Color color, PointF start, PointF vector)
+        {
+            g.DrawLine(new Pen(color, 2), start.X, start.Y, vector.X + start.X, vector.Y + start.Y);
         }
 
         [DllImport("user32.dll")]
