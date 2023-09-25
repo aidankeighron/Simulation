@@ -5,7 +5,7 @@ namespace Simulation
     class PhysicsObject
     {
         // Position
-        protected PointF StartPosition = new PointF(0, 0);
+        protected PointF StartPosition = new PointF(100, 100);
         protected PointF Position = new PointF(0, 0);
 
         // Velocity
@@ -16,7 +16,7 @@ namespace Simulation
         protected PointF Acceleration = new PointF(0, 0);
 
         // Coefficients
-        protected float CoefficientOfRestitution = 0.5f;
+        protected float CoefficientOfRestitution = 0.8f;
 
         // State
         protected float Timestamp = 0;
