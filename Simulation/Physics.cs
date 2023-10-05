@@ -15,6 +15,7 @@ namespace Simulation
 
         // Cube
         private CubePhysics Cube = new CubePhysics(50);
+        private Wall Wall1 = new Wall(new PointF(0, 300), new PointF(300, 960));
 
         // Other
         private int TextY = 0;
@@ -36,9 +37,10 @@ namespace Simulation
             if (Frozen)
             {
                 MouseControls();
-                Cube.tick(Dt);
+                Cube.tick(Dt, Wall1);
             }
             Cube.DrawCube(g);
+            Wall1.DrawWall(g);
             DisplayText("Position", Cube.getPosition(), g);
             DisplayText("Start Position", Cube.getStartPosition(), g);
             DisplayText("Velocity", Cube.getVelocity(), g);

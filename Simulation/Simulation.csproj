@@ -36,6 +36,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InteractableObject.cs" />
     <Compile Include="Physics.cs" />
     <Compile Include="PhysicsObject.cs" />
     <Compile Include="Simulation.cs">

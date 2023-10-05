@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace Simulation
 {
@@ -22,19 +23,27 @@ namespace Simulation
         protected float Timestamp = 0;
 
         virtual
-        public void tick(float dt)
+        public void tick(float dt, Wall wall)
         {
             Timestamp += dt;
-            HandleGravity();
+            HandleGravity(wall);
         }
 
-        public void HandleGravity()
+        public void HandleGravity(Wall wall)
         {
-            Position.X = StartPosition.X + StartVelocity.X * Timestamp;
-            Position.Y = StartPosition.Y + StartVelocity.Y * Timestamp + 0.5f * Physics.Gravity * Timestamp * Timestamp;
-            Velocity.X = StartVelocity.X;
-            Velocity.Y = StartVelocity.Y + Physics.Gravity * Timestamp;
+            PointF newPosition = new PointF(0, 0);
+            PointF newVelocity = new PointF(0, 0);
+            newPosition.X = StartPosition.X + StartVelocity.X * Timestamp;
+            newPosition.Y = StartPosition.Y + StartVelocity.Y * Timestamp + 0.5f * Physics.Gravity * Timestamp * Timestamp;
+            newVelocity.X = StartVelocity.X;
+            newVelocity.Y = StartVelocity.Y + Physics.Gravity * Timestamp;
+            tryMove(newPosition, newVelocity, wall);
             Acceleration.Y = Physics.Gravity;
+        }
+
+        public void Restart(PointF position, PointF velocity)
+        {
+            Restart(position.X, position.Y, velocity.X, velocity.Y);
         }
 
         public void Restart(float x, float y, float vx, float vy)
@@ -46,6 +55,31 @@ namespace Simulation
             StartVelocity.Y = (float)vy;
             Velocity = StartVelocity;
             Timestamp = 0;
+        }
+
+        virtual
+        protected void tryMove(PointF position, PointF velocity, Wall wall)
+        {
+            if (wall.pointCollides(position))
+            {
+                // Hit
+                PointF wallStart = wall.getWall()[0];
+                PointF wallEnd = wall.getWall()[1];
+                double angle = Math.Atan2(wallEnd.Y - wallStart.Y, wallEnd.X - wallStart.X);
+                PointF newVelocity = new PointF((float)(-velocity.Y * Math.Sin(angle) + velocity.X * Math.Cos(angle)),
+                                                (float)(velocity.Y * Math.Cos(angle) + velocity.X * Math.Sin(angle)));
+                if (velocity.Y > 0)
+                {
+                    newVelocity.X *= -1;
+                }
+
+                Restart(position, newVelocity);
+            }
+            else
+            {
+                Position = position;
+                Velocity = velocity;
+            }
         }
 
         public PointF getPosition() { return Position; }
@@ -65,12 +99,33 @@ namespace Simulation
         }
 
         override
-        public void tick(float dt)
+        public void tick(float dt, Wall wall)
         {
+            //this.tick(dt, wall);
             this.Timestamp += dt;
-            this.HandleGravity();
+            this.HandleGravity(wall);
             BoundValues();
         }
+
+        //override
+        //protected void tryMove(PointF position, PointF velocity, Wall wall)
+        //{
+        //    if (wall.lineCollides(new PointF(position.X - CubeSize / 2, position.Y + CubeSize / 2), new PointF(position.X + CubeSize / 2, position.Y - CubeSize / 2)))
+        //    {
+        //        // Hit
+        //        PointF wallStart = wall.getWall()[0];
+        //        PointF wallEnd = wall.getWall()[1];
+        //        double angle = Math.Atan2(wallEnd.Y - wallStart.Y, wallEnd.X - wallStart.X);
+        //        PointF newVelocity = new PointF((float)(-velocity.Y * Math.Sin(angle) + velocity.X * Math.Cos(angle)),
+        //                                        (float)(velocity.Y * Math.Cos(angle) + velocity.X * Math.Sin(angle)));
+        //        Restart(position, newVelocity);
+        //    }
+        //    else
+        //    {
+        //        Position = position;
+        //        Velocity = velocity;
+        //    }
+        //}
 
         public void DrawCube(Graphics g)
         {
