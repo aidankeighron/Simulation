@@ -8,14 +8,17 @@ namespace Simulation
     class Simulation : System.Windows.Forms.Form
     {
         // Constants
-        public const float Gravity = 9.8f;
-        public const float Dt = Simulation.Interval / 100.0f;
-        public const int ScreenWidth = 1536; // TODO pull from system
-        public const int ScreenHeight = 960;
+        public const double Gravity = 9.8;
+        public const int Interval = 20;
+        public const double Dt = Interval / 100.0;
+        public const double PointCollisionError = 0.1;
+        public static int ScreenWidth = Screen.PrimaryScreen.Bounds.Width;//1536;
+        public static int ScreenHeight = Screen.PrimaryScreen.Bounds.Height;//960;
 
-        // Cube
+        // Objects
         private CubePhysics Cube = new CubePhysics(50);
         private Wall Wall1 = new Wall(new Vector(0, 300), new Vector(300, 960));
+        private Wall Wall2 = new Wall(new Vector(1200, 0), new Vector(1536, 560));
 
         // Other
         private int TextY = 0;
@@ -32,7 +35,6 @@ namespace Simulation
             Application.Run(new Simulation());
         }
 
-        public const int Interval = 20;
 
         public Simulation()
         {

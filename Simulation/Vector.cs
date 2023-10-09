@@ -39,6 +39,12 @@ namespace Simulation
             return new Vector(-a.X, -a.Y);
         }
 
+        override
+        public String ToString()
+        {
+            return $"<{String.Format("{0:0.000}", Math.Round(X, 2))}, {String.Format("{0:0.000}", Math.Round(Y, 2))}>";
+        }
+
         public static Vector FromPoint(Point point)
         {
             return new Vector(point.X, point.Y);
@@ -56,7 +62,7 @@ namespace Simulation
 
         public double Angle(Vector other)
         {
-            return Math.Acos(Dot(this + other) / (Magnitude() * other.Magnitude()));
+            return Math.Acos(Dot(other) / (Magnitude() * other.Magnitude()));
         }
 
         public double Dot(Vector other)

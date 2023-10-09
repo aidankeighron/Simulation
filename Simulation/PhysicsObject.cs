@@ -65,10 +65,12 @@ namespace Simulation
                 // Hit
                 Vector wallStart = wall.getWall()[0];
                 Vector wallEnd = wall.getWall()[1];
-                double angle = Math.Atan2(wallEnd.Y - wallStart.Y, wallEnd.X - wallStart.X);
-                Vector newVelocity = new Vector((double)(-velocity.Y * Math.Sin(angle) + velocity.X * Math.Cos(angle)),
-                                                (double)(velocity.Y * Math.Cos(angle) + velocity.X * Math.Sin(angle)));
-                if (velocity.Y > 0)
+                Vector wallAngle = new Vector(wallEnd.Y - wallStart.Y, wallEnd.X - wallStart.X);
+                double flip = velocity.Y > (wallStart.Y - wallEnd.Y) / (wallStart.X - wallEnd.X) * (velocity.X - wallStart.X) + wallStart.Y ? -1 : 1;
+                double angle = flip * velocity.Angle(wallAngle) - Math.Atan(wallAngle.Y / wallAngle.X);
+                //Console.WriteLine($"{velocity.ToString()}|{wallAngle.ToString()} {velocity.Angle(wallAngle)}+{-Math.Atan(wallAngle.Y / wallAngle.X)}={angle * 180.0 / Math.PI}");
+                Vector newVelocity = new Vector(velocity.Magnitude() * Math.Cos(angle), velocity.Magnitude() * Math.Sin(angle));
+                if (flip == -1)
                 {
                     newVelocity.X *= -1;
                 }
@@ -129,8 +131,8 @@ namespace Simulation
 
         public void DrawCube(Graphics g)
         {
-            double xPos = this.Position.X - CubeSize / 2f;
-            double yPos = this.Position.Y - CubeSize / 2f;
+            double xPos = this.Position.X - CubeSize / 2.0;
+            double yPos = this.Position.Y - CubeSize / 2.0;
             g.DrawRectangle(new Pen(Color.Black, 1), (float)xPos, (float)yPos, (float)CubeSize, (float)CubeSize);
         }
 

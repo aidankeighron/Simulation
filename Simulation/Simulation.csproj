@@ -37,11 +37,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InteractableObject.cs" />
-    <Compile Include="Physics.cs" />
     <Compile Include="PhysicsObject.cs" />
     <Compile Include="Simulation.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Vector.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

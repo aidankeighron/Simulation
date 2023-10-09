@@ -9,11 +9,11 @@ namespace Simulation
         {
             double yt = (point.X - lineStart.X) / (lineEnd.X - lineStart.X);
             double xt = (point.Y - lineStart.Y) / (lineEnd.Y - lineStart.Y);
-            if (Math.Abs(yt - xt) > 0.01) // TODO make constant
+            if (Math.Abs(yt - xt) > Simulation.PointCollisionError)
             {
                 return false;
             }
-            return yt >= 0 && yt <= 1;
+            return yt + Simulation.PointCollisionError >= 0 && yt - Simulation.PointCollisionError <= 1;
         }
 
         public static bool doLinesCollide(Vector line1Start, Vector line1End, Vector line2Start, Vector line2End)
