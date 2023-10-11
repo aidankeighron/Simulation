@@ -11,7 +11,7 @@ namespace Simulation
         public const double Gravity = 9.8;
         public const int Interval = 20;
         public const double Dt = Interval / 100.0;
-        public const double PointCollisionError = 0.1;
+        public const double PointCollisionError = 0.05;
         public static int ScreenWidth = Screen.PrimaryScreen.Bounds.Width;//1536;
         public static int ScreenHeight = Screen.PrimaryScreen.Bounds.Height;//960;
 
@@ -76,10 +76,12 @@ namespace Simulation
             if (Frozen)
             {
                 MouseControls();
-                Cube.tick(Dt, Wall1);
+                Cube.tick(Dt, Wall1, g);
+                Cube.tick(Dt, Wall2, g);
             }
             Cube.DrawCube(g);
             Wall1.DrawWall(g);
+            Wall2.DrawWall(g);
             DisplayText("Position", Cube.getPosition(), g);
             DisplayText("Start Position", Cube.getStartPosition(), g);
             DisplayText("Velocity", Cube.getVelocity(), g);
