@@ -16,6 +16,17 @@ namespace Simulation
             return yt + Simulation.PointCollisionError >= 0 && yt - Simulation.PointCollisionError <= 1;
         }
 
+        public static bool isPointOnLine(Vector lineStart, Vector lineEnd, Vector point, double radius)
+        {
+            double yt = (point.X - lineStart.X) / (lineEnd.X - lineStart.X);
+            double xt = (point.Y - lineStart.Y) / (lineEnd.Y - lineStart.Y);
+            if (Math.Abs(yt - xt) > radius)
+            {
+                return false;
+            }
+            return yt + radius >= 0 && yt - radius <= 1;
+        }
+
         public static bool doLinesCollide(Vector line1Start, Vector line1End, Vector line2Start, Vector line2End)
         {
             double bottom = (line1End.Y - line1Start.Y) * (line2End.X - line2Start.X) - (line1End.X - line1Start.X) * (line2End.Y - line2Start.Y);
@@ -48,6 +59,11 @@ namespace Simulation
         public bool pointCollides(Vector point)
         {
             return InteractableObject.isPointOnLine(lineStart, lineEnd, point);
+        }
+
+        public bool pointCollides(Vector point, double radius)
+        {
+            return InteractableObject.isPointOnLine(lineStart, lineEnd, point, radius);
         }
 
         public bool lineCollides(Vector lineStart, Vector lineEnd)

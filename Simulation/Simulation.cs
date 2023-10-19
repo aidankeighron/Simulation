@@ -17,6 +17,7 @@ namespace Simulation
 
         // Objects
         private CubePhysics Cube = new CubePhysics(50);
+        private SpherePhysics Sphere = new SpherePhysics(50);
         private Wall Wall1 = new Wall(new Vector(0, 300), new Vector(300, 960));
         private Wall Wall2 = new Wall(new Vector(1200, 0), new Vector(1536, 560));
 
@@ -77,9 +78,12 @@ namespace Simulation
             {
                 MouseControls();
                 Cube.tick(Dt, Wall1, g);
+                Sphere.tick(Dt, Wall1, g);
                 Cube.tick(Dt, Wall2, g);
+                Sphere.tick(Dt, Wall2, g);
             }
             Cube.DrawCube(g);
+            Sphere.DrawSphere(g);
             Wall1.DrawWall(g);
             Wall2.DrawWall(g);
             DisplayText("Position", Cube.getPosition(), g);
@@ -110,7 +114,11 @@ namespace Simulation
             MousePosition = Vector.FromPoint(Cursor.Position);
             MouseVelocity = new Vector((MousePosition.X - LastMousePosition.X) / (Dt * 4), (MousePosition.Y - LastMousePosition.Y) / (Dt * 4));
             LastMousePosition = MousePosition;
-            if (GetLeftMousePressed())
+            if (GetLeftMousePressed() && GetKeyPressed(0x11))
+            {
+                Sphere.Restart(MousePosition.X, MousePosition.Y, MouseVelocity.X, MouseVelocity.Y);
+            }
+            else if (GetLeftMousePressed())
             {
                 Cube.Restart(MousePosition.X, MousePosition.Y, MouseVelocity.X, MouseVelocity.Y);
             }
@@ -125,8 +133,8 @@ namespace Simulation
             }
 
             MouseVelocity = new Vector((MousePosition.X - LastMousePosition.X) / (Dt * 4), (MousePosition.Y - LastMousePosition.Y) / (Dt * 4));
-            Cube.Restart(MousePosition.X, MousePosition.Y, MouseVelocity.X, MouseVelocity.Y);
-            DrawVector(g, Color.Blue, LastMousePosition, MousePosition);
+            //Cube.Restart(MousePosition.X, MousePosition.Y, MouseVelocity.X, MouseVelocity.Y);
+            //DrawVector(g, Color.Blue, LastMousePosition, MousePosition);
         }
 
         [DllImport("user32.dll")]

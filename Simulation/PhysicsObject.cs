@@ -18,7 +18,7 @@ namespace Simulation
         protected Vector Acceleration = new Vector(0, 0);
 
         // Coefficients
-        protected double CoefficientOfRestitution = 0.8;
+        protected double CoefficientOfRestitution = 0;
 
         // State
         protected double Timestamp = 0;
@@ -79,13 +79,11 @@ namespace Simulation
                 {
                     angle *= -1;
                 }
-                //Console.WriteLine(flip);
-                //Console.WriteLine($"{velocity.ToString()}|{wallAngle.ToString()} {velocity.Angle(wallAngle)}+{-Math.Atan(wallAngle.Y / wallAngle.X)}={angle * 180.0 / Math.PI}");
-                //Vector newVelocity = new Vector(velocity.Magnitude() * Math.Cos(angle), velocity.Magnitude() * Math.Sin(angle));
-                Vector newVelocity = new Vector(50 * Math.Cos(angle), 50 * Math.Sin(angle));
+                Console.WriteLine(Velocity);
+                Console.WriteLine(CoefficientOfRestitution);
+                Vector newVelocity = new Vector(Velocity.Magnitude() * Math.Cos(angle) * CoefficientOfRestitution, Velocity.Magnitude() * Math.Sin(angle) * CoefficientOfRestitution);
 
                 Restart(position, newVelocity);
-                Console.WriteLine($"Flip: {flip} | Vel {velocity.ToString()} | Angle {angle * 180 / Math.PI}");
             }
             else
             {
@@ -108,6 +106,7 @@ namespace Simulation
         public CubePhysics(double cubeSize)
         {
             this.CubeSize = cubeSize;
+            this.CoefficientOfRestitution = 0.8;
         }
 
         override
@@ -161,6 +160,84 @@ namespace Simulation
             double posX = rightWall ? 0 + CubeSize / 2.0f : leftWall ? Simulation.ScreenWidth - CubeSize / 2.0f : Position.X;
             double velX = Velocity.X * this.CoefficientOfRestitution * ((rightWall || leftWall) ? -1 : 1);
             double posY = topWall ? 0 + CubeSize / 2.0f : bottomWall ? Simulation.ScreenHeight - CubeSize / 2.0f : Position.Y;
+            double velY = Velocity.Y * this.CoefficientOfRestitution * ((topWall || bottomWall) ? -1 : 1);
+            if (rightWall || leftWall || topWall || bottomWall)
+                this.Restart(posX, posY, velX, velY);
+        }
+    }
+
+    class SpherePhysics : PhysicsObject
+    {
+        private double SphereRadius;
+        private double Angle = 0;
+        private double RotationalVelocity = 0;
+
+        public SpherePhysics(double sphereRadius)
+        {
+            this.SphereRadius = sphereRadius;
+            this.CoefficientOfRestitution = 0.1;
+        }
+
+        override
+        public void tick(double dt, Wall wall, Graphics g)
+        {
+            Angle = RotationalVelocity * dt;
+            base.tick(dt, wall, g);
+            BoundValues();
+        }
+
+        override
+        protected void tryMove(Vector position, Vector velocity, Wall wall, Graphics g)
+        {
+            double H0 = Simulation.Gravity * this.Position.Y;
+            double H1 = Simulation.Gravity * position.Y;
+            double W0 = 0.25 * SphereRadius * SphereRadius * RotationalVelocity * RotationalVelocity;
+            double V0 = 0.5 * this.Velocity.Magnitude() * this.Velocity.Magnitude();
+            double V1 = 0.5 * velocity.Magnitude() * velocity.Magnitude();
+            // TODO Plus or minus
+            double W1 = Math.Sqrt(Math.Abs((W0 + V0 - V1 + H0 - H1 /*- uFn / M * distance*/) / (0.25 * SphereRadius * SphereRadius)));
+            RotationalVelocity = W1;
+
+            if (wall.pointCollides(position, 0.1))
+            {
+                // Hit
+                Vector wallStart = wall.getWall()[0];
+                Vector wallEnd = wall.getWall()[1];
+                Vector wallAngle = new Vector(wallEnd.X - wallStart.X, wallEnd.Y - wallStart.Y);
+                double flip = velocity.Y > (wallStart.Y - wallEnd.Y) / (wallStart.X - wallEnd.X) * (velocity.X - wallStart.X) + wallStart.Y ? -1 : 1;
+                double angle = flip * velocity.Angle(wallAngle) - Math.Atan(wallAngle.Y / wallAngle.X);
+                if (flip == -1)
+                {
+                    angle *= -1;
+                }
+                Vector newVelocity = new Vector(Velocity.Magnitude() * Math.Cos(angle) * CoefficientOfRestitution, Velocity.Magnitude() * Math.Sin(angle) * CoefficientOfRestitution);
+
+                Restart(position, newVelocity);
+            }
+            else
+            {
+                this.Velocity = velocity;
+                this.Position = position;
+            }
+        }
+
+        public void DrawSphere(Graphics g)
+        {
+            double xPos = this.Position.X - SphereRadius / 2.0;
+            double yPos = this.Position.Y - SphereRadius / 2.0;
+            g.DrawEllipse(new Pen(Color.Black, 1), (float)xPos, (float)yPos, (float)SphereRadius, (float)SphereRadius);
+            g.DrawLine(new Pen(Color.Red, 1), Position.ToPoint(), (Position + new Vector(SphereRadius * Math.Cos(Angle), SphereRadius * Math.Sin(Angle))).ToPoint());
+        }
+
+        public void BoundValues()
+        {
+            bool rightWall = Position.X <= 0 + SphereRadius / 2.0f;
+            bool leftWall = Position.X >= Simulation.ScreenWidth - SphereRadius / 2.0f;
+            bool topWall = Position.Y <= 0 + SphereRadius / 2.0f;
+            bool bottomWall = Position.Y >= Simulation.ScreenHeight - SphereRadius / 2.0f;
+            double posX = rightWall ? 0 + SphereRadius / 2.0f : leftWall ? Simulation.ScreenWidth - SphereRadius / 2.0f : Position.X;
+            double velX = Velocity.X * this.CoefficientOfRestitution * ((rightWall || leftWall) ? -1 : 1);
+            double posY = topWall ? 0 + SphereRadius / 2.0f : bottomWall ? Simulation.ScreenHeight - SphereRadius / 2.0f : Position.Y;
             double velY = Velocity.Y * this.CoefficientOfRestitution * ((topWall || bottomWall) ? -1 : 1);
             if (rightWall || leftWall || topWall || bottomWall)
                 this.Restart(posX, posY, velX, velY);

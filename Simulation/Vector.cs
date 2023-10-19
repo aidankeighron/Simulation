@@ -29,6 +29,11 @@ namespace Simulation
             return new Vector(a.X * b, a.Y * b);
         }
 
+        public static Vector operator *(double a, Vector b)
+        {
+            return new Vector(a * b.X, a * b.Y);
+        }
+
         public static Vector operator /(Vector a, double b)
         {
             return new Vector(a.X / b, a.Y / b);
@@ -43,6 +48,11 @@ namespace Simulation
         public String ToString()
         {
             return $"<{String.Format("{0:0.000}", Math.Round(X, 2))}, {String.Format("{0:0.000}", Math.Round(Y, 2))}>";
+        }
+
+        public Point ToPoint()
+        {
+            return new Point((int)X, (int)Y);
         }
 
         public static Vector FromPoint(Point point)
